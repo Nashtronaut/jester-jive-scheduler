@@ -1,8 +1,11 @@
 <script lang="ts">
+    import { open } from '@tauri-apps/api/shell';
 	import { Button, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
 	import type { RoughGroup } from "../../types";
 	import { checkNames } from "$lib/helpers/sorter";
 	import { onMount } from "svelte";
+	import { writeSchedule } from "$lib/helpers/writer";
+    import { appDataDir } from '@tauri-apps/api/path';
 
     export let groups: RoughGroup[];
     export let isVerified: boolean;
@@ -25,10 +28,15 @@
                 <p>Groups listed in <span class="text-purple-500">PURPLE</span> should be carefully checked, as this means duplicate dancers were detected </p>    
             </div>
         </div>
-        <Button class="w-30"  color="blue" on:click={() => isVerified = false}>EXPORT TO CSV</Button>
+        <Button class="w-30"  color="blue" on:click={async () => {
+            await writeSchedule(groupsWithDancers);
+            const appDataDirPath = await appDataDir();
+            console.log(`${appDataDirPath}/generatedSchedule.csv`);
+            await open(`${appDataDirPath}/generatedSchedule.csv`);
+        }}>EXPORT TO CSV</Button>
     </div>
     <div class="flex flex-col gap-14">
-        {#each groupsWithDancers as { category, size, level, dancers }, index}
+        {#each groupsWithDancers as { category, size, level, dancers, time }, index}
         {#if dancers.length !== 0}
             <div class="mt-8">
                 <p class="text-2xl text-center font-bold">Group {index + 1}</p>
@@ -37,6 +45,7 @@
                     <p class="text-xl text-center font-bold"><span class="text-gray-400 font-normal">Size:</span> {size.slice(0, 1).toUpperCase() + size.slice(1, size.length)}</p>
                     <p class="text-xl text-center font-bold"><span class="text-gray-400 font-normal">Levels:</span> {level.join(', ')}</p>
                     <p class="text-xl text-center font-bold"><span class="text-gray-400 font-normal">Group Count:</span> {dancers.length}</p>
+                    <p class="text-xl text-center font-bold"><span class="text-gray-400 font-normal">Time:</span> {time} mins</p>
                 </div>
                     <Table color={`${category === 'unplaceable' ? "red" : "green"}`} striped shadow hoverable>
                         <TableHead>
