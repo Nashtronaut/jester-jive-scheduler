@@ -271,7 +271,7 @@ export const checkNames = (names: string | null, duplicatedNames: string[]) => {
     return false;
 };
 
-const timeCategories = (categories) => {
+const timeCategories = (categories: RoughGroup[]) => {
     let timeAddition = 0;
     categories.forEach((category) => {
         timeAddition = category.size === 'solo' ? 3 : category.size === 'duet' ? 3.5 : category.size === 'small' ? 4 : category.size === 'medium' ? 4 : category.size === 'large' ? 5 : 0;
@@ -287,7 +287,7 @@ const timeCategories = (categories) => {
     return categories;
 };
 
-const organizeCategories = (categories) => {
+const organizeCategories = (categories: RoughGroup[]) => {
     const dancerIndices = {}; // Track dancer names and their indices in the categories array
 
     // Gather dancer names and their indices in the categories array

@@ -4,9 +4,10 @@ import { writeTextFile, createDir, exists, BaseDirectory } from '@tauri-apps/api
 export const writeSchedule = async (categories: RoughGroup[]) => {
     await makeDir();
 
-    let csvValues = `,,,,,,,,\n,,,,,,,\n`;
-
-    categories.forEach((category) => {
+    let csvValues = ``;
+    
+    categories.forEach((category, index) => {
+        csvValues += `GROUP ${index + 1}\n`
         csvValues += `Category: ${category.category},Size: ${category.size.slice(0, 1).toUpperCase() + category.size.slice(1)},Levels: ${category.level.join(' + ')},Time: ${category.time} mins\n`;
         csvValues += `Name,Age,Level,Discipline,Performance/Competition,Group,Number Of Dancers,Dancers,Studio\n`;
 
