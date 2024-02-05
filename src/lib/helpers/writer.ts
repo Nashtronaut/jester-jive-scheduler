@@ -11,7 +11,7 @@ export const writeSchedule = async (categories: RoughGroup[]) => {
         csvValues += `Name,Age,Level,Discipline,Performance/Competition,Group,Number Of Dancers,Dancers,Studio\n`;
 
         category.dancers.forEach((dancer) => {
-            csvValues += `${dancer.name},${dancer.age},${dancer.level},${dancer.discipline},${dancer.perf_comp},${dancer.group},${dancer.dancers_names?.length ?? 'Unknown'},${dancer.dancers_names ? '"' + dancer.dancers_names + '"': 'Unknown'},${dancer.studio}\n`;
+            csvValues += `${dancer.name},${dancer.age},${dancer.level},${dancer.discipline},${dancer.perf_comp},${dancer.group},${dancer.dancers_names?.split(',').length ?? 'Unknown'},${dancer.dancers_names ? '"' + dancer.dancers_names + '"': 'Unknown'},${dancer.studio}\n`;
         });
 
         csvValues += ',,,,,,,,\n,,,,,,,\n';
