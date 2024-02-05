@@ -7,7 +7,7 @@ export const writeSchedule = async (categories: RoughGroup[]) => {
     let csvValues = `,,,,,,,,\n,,,,,,,\n`;
 
     categories.forEach((category) => {
-        csvValues += `Category: ${category.category},Size: ${category.size.slice(0, 1).toUpperCase() + category.size.slice(1)},Levels: ${'"' + category.level.join(', ') + '"'},Time: ${category.time} mins\n`;
+        csvValues += `Category: ${category.category},Size: ${category.size.slice(0, 1).toUpperCase() + category.size.slice(1)},Levels: ${category.level.join(' + ')},Time: ${category.time} mins\n`;
         csvValues += `Name,Age,Level,Discipline,Performance/Competition,Group,Number Of Dancers,Dancers,Studio\n`;
 
         category.dancers.forEach((dancer) => {
