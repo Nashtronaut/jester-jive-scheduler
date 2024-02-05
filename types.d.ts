@@ -39,4 +39,5 @@ export type RoughGroup = {
     size: string;
     level: string[];
     dancers: Dancer[];
+    time: number;
 }

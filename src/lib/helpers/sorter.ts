@@ -124,8 +124,13 @@ export const createGroups = (data: Dancer[]) => {
 
     const dupesFound = findSameNames(results);
     const sortedResults = sortDuplicates(results, dupesFound);
+    const organizedCategories = organizeCategories(sortedResults);
 
-    return sortedResults;
+
+    // HERE
+    const timedCategories = timeCategories(organizedCategories);
+
+    return organizedCategories;
 }
 
 export const findSameNames = (groups: RoughGroup[]) => {
@@ -208,9 +213,6 @@ const sortDuplicates = (data: RoughGroup[], nameCounts: Record<string, number>) 
         }
     });
 
-    groupsWithDuplicates = randomizeOrder(groupsWithDuplicates);
-    groupsWithoutDuplicates = randomizeOrder(groupsWithoutDuplicates);
-
     const insertionPoint = findInsertionPoint(groupsWithDuplicates, groupsWithoutDuplicates);
 
     if (!insertionPoint || insertionPoint === 1 ) {
@@ -252,19 +254,6 @@ const findInsertionPoint = (withDuplicates: RoughGroup[], withoutDuplicates: Rou
         return Math.floor(withoutLength / withLength);
     }
 }
-
-const randomizeOrder = (groups: RoughGroup[]) => {
-    // Create a copy of the array to avoid modifying the original
-    const shuffledGroups = [...groups];
-
-    // Fisher-Yates shuffle algorithm
-    for (let i = shuffledGroups.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledGroups[i], shuffledGroups[j]] = [shuffledGroups[j], shuffledGroups[i]];
-    }
-
-    return shuffledGroups;
-}
   
 export const checkNames = (names: string | null, duplicatedNames: string[]) => {
     if (!names) {
@@ -281,3 +270,77 @@ export const checkNames = (names: string | null, duplicatedNames: string[]) => {
 
     return false;
 };
+
+const timeCategories = (categories) => {
+    let timeAddition = 0;
+    categories.forEach((category) => {
+        timeAddition = category.size === 'solo' ? 3 : category.size === 'duet' ? 3.5 : category.size === 'small' ? 4 : category.size === 'medium' ? 4 : category.size === 'large' ? 5 : 0;
+
+        if (category.dancers.length > 0) {
+            category.time = timeAddition * category.dancers.length;
+        } else {
+            category.time = 0;
+        }
+    });
+
+    
+    return categories;
+};
+
+const organizeCategories = (categories) => {
+    const dancerIndices = {}; // Track dancer names and their indices in the categories array
+
+    // Gather dancer names and their indices in the categories array
+    categories.forEach((category, categoryIndex) => {
+        category.dancers.forEach(dancer => {
+            if (dancer.dancers_names) {
+                const names = dancer.dancers_names.split(',').map(name => name.trim()); // Extract dancer names
+                names.forEach(name => {
+                    if (!dancerIndices[name]) {
+                        dancerIndices[name] = [];
+                    }
+                    dancerIndices[name].push(categoryIndex);
+                });
+            }
+        });
+    });
+
+    // Ensure categories with the same dancer names are not adjacent
+    const shuffledCategories = shuffle(categories);
+    const organizedCategories = [shuffledCategories[0]]; // Start with the first shuffled category
+
+    for (let i = 1; i < shuffledCategories.length; i++) {
+        const category = shuffledCategories[i];
+        const lastCategory = organizedCategories[organizedCategories.length - 1];
+        let shouldPush = true;
+
+        // Check if any dancer name from the current category appears in the last category
+        category.dancers.forEach(dancer => {
+            if (dancer.dancers_names) {
+                const names = dancer.dancers_names.split(',').map(name => name.trim());
+                names.forEach(name => {
+                    if (lastCategory.dancers.some(prevDancer => prevDancer.dancers_names && prevDancer.dancers_names.includes(name))) {
+                        shouldPush = false;
+                    }
+                });
+            }
+        });
+
+        if (shouldPush) {
+            organizedCategories.push(category);
+        } else {
+            organizedCategories.unshift(category);
+        }
+    }
+
+    return organizedCategories;
+}
+
+// Helper function to shuffle an array
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
