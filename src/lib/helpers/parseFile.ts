@@ -5,10 +5,10 @@ const parseFile = async (file: FileList | undefined) => {
 
   const fileContent = await readFile(file[0]);
   const result = Papa.parse(fileContent, {
-  header: true,
-  delimiter: ',',
-  dynamicTyping: true,
-  skipEmptyLines: true,
+    header: true,
+    delimiter: ',',
+    dynamicTyping: true,
+    skipEmptyLines: true,
   });
 
   const data = result.data.map((row) => convertKeys(row));

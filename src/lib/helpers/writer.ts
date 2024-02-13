@@ -8,10 +8,10 @@ export const writeSchedule = async (categories: RoughGroup[]) => {
 
     categories.forEach((category) => {
         csvValues += `Category: ${category.category},Size: ${category.size.slice(0, 1).toUpperCase() + category.size.slice(1)},Levels: ${'"' + category.level.join(', ') + '"'},Time: ${category.time} mins\n`;
-        csvValues += `Name,Age,Level,Discipline,Performance/Competition,Group,Number Of Dancers,Dancers,Studio\n`;
+        csvValues += `Number,Name,Age,Level,Discipline,Performance/Competition,Group,Number Of Dancers,Dancers,Studio\n`;
 
         category.dancers.forEach((dancer) => {
-            csvValues += `${dancer.name},${dancer.age},${dancer.level},${dancer.discipline},${dancer.perf_comp},${dancer.group},${dancer.dancers_names?.length ?? 'Unknown'},${dancer.dancers_names ? '"' + dancer.dancers_names + '"': 'Unknown'},${dancer.studio}\n`;
+            csvValues += `${dancer.group_number},${dancer.name},${dancer.age},${dancer.level},${dancer.discipline},${dancer.perf_comp},${dancer.group},${dancer.number_of_dancers ? dancer.number_of_dancers : dancer.dancers_names?.length ?? 'Unknown'},${dancer.dancers_names ? '"' + dancer.dancers_names + '"': 'Unknown'},${dancer.studio}\n`;
         });
 
         csvValues += ',,,,,,,,\n,,,,,,,\n';

@@ -20,7 +20,8 @@
                 <li>Level (Group level)</li>
                 <li>Discipline (Dance Type)</li>
                 <li>Group (Size of group)</li>
-                <li>Perf/Comp (Performance or Competitive)</li>                
+                <li>Perf/Comp (Performance or Competitive)</li>       
+                <li>Number of Dancers</li>         
                 <li>Dancers Names (Names of Dancers)</li>
                 <li>Studio</li>
             </ul>
