@@ -102,7 +102,10 @@ import type { Dancer, RoughGroup } from './../../types.js';
 				(data = null), (files = undefined);
 			}}>Go Back</Button
 		>
-		<p class="flex-1 text-center">Please verify the information!</p>
+		<div class="flex flex-col items-center gap-1">
+			<p class="flex-1 text-center">Please verify the information!</p>
+			<p class="">I FOUND {data.length} GROUPS IN THE FILE </p>
+		</div>
 		<Button
             class="w-40"
             color="blue"
@@ -129,7 +132,7 @@ import type { Dancer, RoughGroup } from './../../types.js';
 				<TableHeadCell>Studio</TableHeadCell>
 			</TableHead>
 			<TableBody tableBodyClass="divide-y">
-				{#each showableItems as { age, dancers_names, discipline, group, level, name, perf_comp, studio }}
+				{#each showableItems as { age, dancers_names, discipline, group, level, name, perf_comp, studio, number_of_dancers }}
 					<TableBodyRow>
 						<TableBodyCell tdClass="px-6 py-4 text-sm">{name}</TableBodyCell>
 						<TableBodyCell tdClass="px-6 py-4 text-sm">{age}</TableBodyCell>
@@ -137,9 +140,13 @@ import type { Dancer, RoughGroup } from './../../types.js';
 						<TableBodyCell tdClass="px-6 py-4 text-sm">{discipline}</TableBodyCell>
 						<TableBodyCell tdClass="px-6 py-4 text-sm">{perf_comp}</TableBodyCell>
 						<TableBodyCell tdClass="px-6 py-4 text-sm">{group}</TableBodyCell>
-						<TableBodyCell tdClass="px-6 py-4 text-sm"
-							>{dancers_names ? dancers_names.split(',').length : 'Unknown'}</TableBodyCell
-						>
+						<TableBodyCell tdClass="px-6 py-4 text-sm">
+							{#if number_of_dancers}
+								{number_of_dancers}
+							{:else}
+								{dancers_names ? dancers_names.split(',').length : 'Unknown'}
+							{/if}
+						</TableBodyCell>
 						<TableBodyCell
 							class="whitespace-normal max-w-xl"
 							tdClass="px-6 py-4 text-sm whitespace-normal">{dancers_names ?? "Unknown"}</TableBodyCell

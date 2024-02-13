@@ -77,58 +77,70 @@ const sortByLevel = (data: SortBySize[]) => {
     return fullSort;
 };
 
-export const createGroups = (data: Dancer[]) => {
+export const createGroups = (data: Dancer[]): OrganizedCategories[] => {
+    // Categorize and sort the data
     const categorized = sortByCategory(data);
     const sized = sortBySize(categorized);
     const fullSort = sortByLevel(sized);
 
+    // Initialize results array
     const results: RoughGroup[] = [];
 
+    let currentDancerId = 0;
+
+    // Process each discipline and size
     fullSort.forEach((discipline: SortBySize) => {
-      for (const key in discipline) {
-        if (key === 'discipline') continue;
-    
-        const maxSize: number = key === 'solo' ? 8 : key === 'duet' ? 8 : key === 'small' ? 7 : key === 'medium' ? 5 : key === 'large' ? 4 : 0;
-        
-        const dancers = discipline[key as keyof SortBySize];
+        for (const key in discipline) {
+            if (key === 'discipline') continue;
 
-        let currGroup: RoughGroup = {
-          category: discipline.discipline,
-          size: key,
-          level: [],
-          dancers: []
-        };
+            const maxSize: number = key === 'solo' ? 8 :
+                                    key === 'duet' ? 8 :
+                                    key === 'small' ? 7 :
+                                    key === 'medium' ? 5 :
+                                    key === 'large' ? 4 :
+                                    key === 'unplaceable' ? Infinity : 0;
 
-        while (dancers.length > 0) {
-            // Line 89 prevents this problem.
-            const currDancer = dancers.shift();
+            const dancers = discipline[key as keyof SortBySize];
 
-            if (currGroup.level.length < 2 && currGroup.dancers.length < maxSize) {
-                if (!currGroup.level.includes(currDancer.level)) {
-                    currGroup.level.push(currDancer?.level as string);
+            // Distribute dancers into groups
+            let currGroup: RoughGroup = {
+                category: discipline.discipline,
+                size: key,
+                level: [],
+                dancers: []
+            };
+
+            for (const dancer of dancers) {
+                dancer.id = currentDancerId++;
+
+                if (currGroup.level.length < 3 && currGroup.dancers.length < maxSize) {
+                    if (!currGroup.level.includes(dancer.level)) {
+                        currGroup.level.push(dancer.level);
+                    }
+                    currGroup.dancers.push(dancer);
+                } else {
+                    results.push(currGroup);
+                    currGroup = {
+                        category: discipline.discipline,
+                        size: key,
+                        level: [dancer.level],
+                        dancers: [dancer] // Start a new group with the current dancer
+                    };
                 }
-
-                currGroup.dancers.push(currDancer as Dancer);
-            } else {
-                results.push(currGroup);
-                currGroup = {
-                    category: discipline.discipline,
-                    size: key,
-                    level: [],
-                    dancers: []
-                };
             }
-          }
-        }    
+
+            // Push the last incomplete group
+            if (currGroup.dancers.length > 0) {
+                results.push(currGroup);
+            }
+        }
     });
 
+    // Further processing (e.g., handling duplicates, sorting, organizing)
     const dupesFound = findSameNames(results);
     const sortedResults = sortDuplicates(results, dupesFound);
     const organizedCategories = organizeCategories(sortedResults);
-
-
-    // HERE
-    const timedCategories = timeCategories(organizedCategories);
+    timeCategories(organizedCategories);
 
     return organizedCategories;
 }
